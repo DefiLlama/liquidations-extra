@@ -2,6 +2,12 @@
   "name": "liquidations-extra",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
+    "postinstall": "sh post-install.sh"
+  },
   "dependencies": {
     "dotenv": "^16.0.3",
     "express": "^4.18.1"
