@@ -1,7 +1,8 @@
+import * as fs from "fs/promises";
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
+import { performance } from "perf_hooks";
 import { Liq } from "./DefiLlama-Adapters/liquidations/utils/types";
-import * as fs from "fs/promises";
 
 interface LiquidationAdapter {
   // chain name
@@ -72,3 +73,4 @@ const getCachedLiqs = async (protocol: string, chain: string) => {
 
 // run fetchLiquidations every 20 minutes
 setInterval(fetchLiquidations, 1000 * 60 * 20);
+fetchLiquidations();
