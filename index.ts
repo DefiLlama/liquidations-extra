@@ -16,6 +16,8 @@ const venus = (_venus as any).default as LiquidationAdapter;
 
 dotenv.config();
 
+const STORE = {};
+
 const app: Express = express();
 const port = process.env.PORT;
 
@@ -42,12 +44,7 @@ const fetchLiquidations = async () => {
         const liquidations = await liquidationsFunc.liquidations();
         await storeCachedLiqs("venus", chain, JSON.stringify(liquidations));
         const _end = performance.now();
-        console.log(
-          `Fetched ${"venus"} data for ${chain} in ${(
-            (_end - _start) /
-            1000
-          ).toLocaleString()}s`,
-        );
+        console.log(`Fetched ${"venus"} data for ${chain} in ${((_end - _start) / 1000).toLocaleString()}s`);
       } catch (e) {
         console.error(e);
       }
@@ -55,19 +52,12 @@ const fetchLiquidations = async () => {
   );
 };
 
-const storeCachedLiqs = async (
-  protocol: string,
-  chain: string,
-  data: string,
-) => {
-  // save to local as json
-  const path = `./temp/${protocol}/${chain}.json`;
-  await fs.writeFile(path, data, "utf8");
+const storeCachedLiqs = async (protocol: string, chain: string, data: string) => {
+  STORE[protocol] = { [chain]: data };
 };
 
 const getCachedLiqs = async (protocol: string, chain: string) => {
-  const path = `./temp/${protocol}/${chain}.json`;
-  const data = await fs.readFile(path, "utf8");
+  const data = STORE[protocol]?.[chain];
   return JSON.parse(data);
 };
 
