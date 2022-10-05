@@ -58,6 +58,7 @@ const fetchLiquidations = async () => {
 };
 
 const storeCachedLiqs = async (protocol: string, chain: string, data: string) => {
+  delete STORE[protocol];
   STORE[protocol] = { [chain]: data };
 };
 
