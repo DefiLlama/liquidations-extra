@@ -24,7 +24,8 @@ const port = process.env.PORT;
 app.get("/venus/bsc", async (_req: Request, res: Response) => {
   try {
     const data = await getCachedLiqs("venus", "bsc");
-    res.json(data);
+    res.setHeader("Content-Type", "application/json");
+    res.send(data);
   } catch (e) {
     console.error(e);
     res.status(500).send("Internal Server Error");
@@ -58,7 +59,7 @@ const storeCachedLiqs = async (protocol: string, chain: string, data: string) =>
 
 const getCachedLiqs = async (protocol: string, chain: string) => {
   const data = STORE[protocol]?.[chain];
-  return JSON.parse(data);
+  return data;
 };
 
 // run fetchLiquidations every 20 minutes
