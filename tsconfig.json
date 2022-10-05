@@ -3,21 +3,20 @@
     "outDir": "./dist",
     "noImplicitAny": false,
     "strictNullChecks": false,
-    "target": "es2019",
+    "target": "es2016",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "noEmit": false,
     "jsx": "preserve",
     "allowJs": true,
     "noImplicitThis": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": true,
-    "lib": ["ES2019"]
-  }
+    "noUnusedLocals": false
+  },
+  "include": ["index.ts"]
 }

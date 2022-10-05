@@ -3,6 +3,7 @@ import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import { performance } from "perf_hooks";
 import { Liq } from "./DefiLlama-Adapters/liquidations/utils/types";
+import * as _venus from "./DefiLlama-Adapters/liquidations/venus";
 
 interface LiquidationAdapter {
   // chain name
@@ -11,8 +12,7 @@ interface LiquidationAdapter {
   };
 }
 
-const venus =
-  require("./DefiLlama-Adapters/liquidations/venus") as LiquidationAdapter;
+const venus = (_venus as any).default as LiquidationAdapter;
 
 dotenv.config();
 

@@ -1,1 +1,2 @@
-[ ! -d "DefiLlama-Adapters" ] && npx degit https://github.com/DefiLlama/DefiLlama-Adapters
+rm -rf DefiLlama-Adapters
+npx degit https://github.com/DefiLlama/DefiLlama-Adapters DefiLlama-Adapters
