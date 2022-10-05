@@ -24,8 +24,12 @@ const port = process.env.PORT;
 app.get("/venus/bsc", async (_req: Request, res: Response) => {
   try {
     const data = await getCachedLiqs("venus", "bsc");
-    res.setHeader("Content-Type", "application/json");
-    res.send(data);
+    if (data) {
+      res.setHeader("Content-Type", "application/json");
+      res.send(data);
+    } else {
+      res.status(404).send("No data");
+    }
   } catch (e) {
     console.error(e);
     res.status(500).send("Internal Server Error");
