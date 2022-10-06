@@ -67,6 +67,6 @@ const getCachedLiqs = async (protocol: string, chain: string) => {
   return data;
 };
 
-// run fetchLiquidations every 20 minutes
-setInterval(fetchLiquidations, 1000 * 60 * 20);
+// run fetchLiquidations every 40 minutes
+setInterval(fetchLiquidations, 1000 * 60 * 40);
 fetchLiquidations();
