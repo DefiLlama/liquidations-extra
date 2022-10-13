@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { performance } from "perf_hooks";
 import { Liq } from "./DefiLlama-Adapters/liquidations/utils/types";
 import * as _venus from "./DefiLlama-Adapters/liquidations/venus";
+import * as _aaveV2 from "./DefiLlama-Adapters/liquidations/aave-v2";
 
 interface LiquidationAdapter {
   // chain name
@@ -13,6 +14,7 @@ interface LiquidationAdapter {
 }
 
 const venus = (_venus as any).default as LiquidationAdapter;
+const aaveV2 = (_aaveV2 as any).default as LiquidationAdapter;
 
 dotenv.config();
 
@@ -21,9 +23,9 @@ const STORE = {};
 const app: Express = express();
 const port = process.env.PORT;
 
-app.get("/venus/bsc", async (_req: Request, res: Response) => {
+const handleLiqsReq = (protocol: string, chain: string) => async (_req: Request, res: Response) => {
   try {
-    const data = await getCachedLiqs("venus", "bsc");
+    const data = await getCachedLiqs(protocol, chain);
     if (data) {
       res.setHeader("Content-Type", "application/json");
       res.send(data);
@@ -34,13 +36,19 @@ app.get("/venus/bsc", async (_req: Request, res: Response) => {
     console.error(e);
     res.status(500).send("Internal Server Error");
   }
-});
+};
+
+app.get("/venus/bsc", handleLiqsReq("venus", "bsc"));
+
+app.get("/aave-v2/ethereum", handleLiqsReq("aave-v2", "ethereum"));
+
+app.get("/aave-v2/polygon", handleLiqsReq("aave-v2", "polygon"));
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
 });
 
-const fetchLiquidations = async () => {
+const fetchVenusLiquidations = async () => {
   await Promise.all(
     Object.entries(venus).map(async ([chain, liquidationsFunc]) => {
       try {
@@ -50,6 +58,23 @@ const fetchLiquidations = async () => {
         await storeCachedLiqs("venus", chain, JSON.stringify(liquidations));
         const _end = performance.now();
         console.log(`Fetched ${"venus"} data for ${chain} in ${((_end - _start) / 1000).toLocaleString()}s`);
+      } catch (e) {
+        console.error(e);
+      }
+    }),
+  );
+};
+
+const fetchAaveV2Liquidations = async () => {
+  await Promise.all(
+    Object.entries(aaveV2).map(async ([chain, liquidationsFunc]) => {
+      try {
+        const _start = performance.now();
+        console.log(`Fetching ${"aave-v2"} data for ${chain}`);
+        const liquidations = await liquidationsFunc.liquidations();
+        await storeCachedLiqs("aave-v2", chain, JSON.stringify(liquidations));
+        const _end = performance.now();
+        console.log(`Fetched ${"aave-v2"} data for ${chain} in ${((_end - _start) / 1000).toLocaleString()}s`);
       } catch (e) {
         console.error(e);
       }
@@ -67,6 +92,12 @@ const getCachedLiqs = async (protocol: string, chain: string) => {
   return data;
 };
 
-// run fetchLiquidations every 40 minutes
-setInterval(fetchLiquidations, 1000 * 60 * 40);
-fetchLiquidations();
+// run every 30 minutes
+setInterval(fetchVenusLiquidations, 1000 * 60 * 30);
+fetchVenusLiquidations();
+
+// run every 30 minutes but delayed by 20 minutes
+setTimeout(() => {
+  setInterval(fetchAaveV2Liquidations, 1000 * 60 * 30);
+  fetchAaveV2Liquidations();
+}, 1000 * 60 * 30);
