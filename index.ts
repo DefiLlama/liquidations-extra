@@ -28,6 +28,7 @@ const handleLiqsReq = (protocol: string, chain: string) => async (_req: Request,
     const data = await getCachedLiqs(protocol, chain);
     if (data) {
       res.setHeader("Content-Type", "application/json");
+      res.setHeader("Cache-Control", "public, max-age=1200");
       res.send(data);
     } else {
       res.status(404).send("No data");
