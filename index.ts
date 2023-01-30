@@ -31,10 +31,12 @@ const handleLiqsReq = (protocol: string, chain: string) => async (_req: Request,
       res.setHeader("Cache-Control", "public, max-age=1200");
       res.send(data);
     } else {
+      res.setHeader("Cache-Control", "public, max-age=600");
       res.status(404).send("No data");
     }
   } catch (e) {
     console.error(e);
+    res.setHeader("Cache-Control", "public, max-age=600");
     res.status(500).send("Internal Server Error");
   }
 };
