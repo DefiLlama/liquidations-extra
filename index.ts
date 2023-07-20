@@ -91,9 +91,6 @@ const fetchVenusLiquidations = async () => {
 
 const fetchMakerLiquidations = async () => {
   for (const chain of Object.keys(maker)) {
-    if (chain === "ethereum") {
-      continue;
-    }
     try {
       const _start = performance.now();
       console.log(`Fetching ${"maker"} data for ${chain}`);
