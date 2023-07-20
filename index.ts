@@ -5,6 +5,7 @@ import { performance } from "perf_hooks";
 import { Liq } from "./DefiLlama-Adapters/liquidations/utils/types";
 import * as _venus from "./DefiLlama-Adapters/liquidations/venus";
 // import * as _aaveV2 from "./DefiLlama-Adapters/liquidations/aave-v2";
+import maker from "./additional-adapters/maker";
 
 interface LiquidationAdapter {
   // chain name
@@ -47,6 +48,8 @@ app.get("/venus/bsc", handleLiqsReq("venus", "bsc"));
 
 // app.get("/aave-v2/polygon", handleLiqsReq("aave-v2", "polygon"));
 
+app.get("/maker/ethereum", handleLiqsReq("maker", "ethereum"));
+
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
 });
@@ -86,6 +89,24 @@ const fetchVenusLiquidations = async () => {
 //   }
 // };
 
+const fetchMakerLiquidations = async () => {
+  for (const chain of Object.keys(maker)) {
+    if (chain === "ethereum") {
+      continue;
+    }
+    try {
+      const _start = performance.now();
+      console.log(`Fetching ${"maker"} data for ${chain}`);
+      const liquidations = await maker[chain].liquidations();
+      await storeCachedLiqs("maker", chain, JSON.stringify(liquidations));
+      const _end = performance.now();
+      console.log(`Fetched ${"maker"} data for ${chain} in ${((_end - _start) / 1000).toLocaleString()}s`);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+};
+
 const storeCachedLiqs = async (protocol: string, chain: string, data: string) => {
   delete STORE[protocol];
   STORE[protocol] = { [chain]: data };
@@ -106,3 +127,9 @@ fetchVenusLiquidations();
 //   fetchAaveV2Liquidations();
 //   // }, 1000 * 60 * 20);
 // }, 0);
+
+// run every 30 minutes but delayed by 20 minutes
+setTimeout(() => {
+  setInterval(fetchMakerLiquidations, 1000 * 60 * 30);
+  fetchMakerLiquidations();
+}, 1000 * 60 * 20);
