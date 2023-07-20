@@ -128,8 +128,8 @@ fetchVenusLiquidations();
 //   // }, 1000 * 60 * 20);
 // }, 0);
 
-// run every 30 minutes but delayed by 20 minutes
+// run every 30 minutes
 setTimeout(() => {
   setInterval(fetchMakerLiquidations, 1000 * 60 * 30);
   fetchMakerLiquidations();
-}, 1000 * 60 * 20);
+}, 0);
