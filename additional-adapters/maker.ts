@@ -1209,9 +1209,16 @@ const positions = async (): Promise<Liq[]> => {
     allowFailure: false,
   });
 
-  const decimals = await publicClient.multicall({
-    contracts: collaterals.map((collateral) => ({ ...ERC20, address: collateral, functionName: "decimals" })),
-    allowFailure: false,
+  const decimals = (
+    await publicClient.multicall({
+      contracts: collaterals.map((collateral) => ({ ...ERC20, address: collateral, functionName: "decimals" })),
+    })
+  ).map(({ status, result }) => {
+    if (status === "success" && result) {
+      return Number(result);
+    } else {
+      return 18;
+    }
   });
 
   const urnParamPairs = cdps.map((i) => [ilkIds[Number(i) - 1], urnHandlers[Number(i) - 1]]);
@@ -1252,7 +1259,7 @@ const positions = async (): Promise<Liq[]> => {
       const collateral = "ethereum:" + collaterals[i - 1].toLowerCase();
 
       const decimal = decimals[i - 1];
-      const collateralAmountFormatted = (collateralAmount * 10 ** Number(decimal)).toFixed(2);
+      const collateralAmountFormatted = (collateralAmount * 10 ** decimal).toFixed(2);
 
       return {
         collateralAmount: collateralAmountFormatted,
