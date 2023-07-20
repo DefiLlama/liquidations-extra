@@ -1213,10 +1213,11 @@ const positions = async (): Promise<Liq[]> => {
     await publicClient.multicall({
       contracts: collaterals.map((collateral) => ({ ...ERC20, address: collateral, functionName: "decimals" })),
     })
-  ).map(({ status, result }) => {
+  ).map(({ status, result }, i) => {
     if (status === "success" && result) {
       return Number(result);
     } else {
+      console.log("decimals failed for", collaterals[i], i);
       return 18;
     }
   });
